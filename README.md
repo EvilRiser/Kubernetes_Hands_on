@@ -20,7 +20,7 @@ ___
 First ssh to your network  
 In cmd write  
 ```
-$ ssh user_name@hostname -y
+$ ssh "user_name@hostname" -y
 ```
 Here -y to accept all conditions or use ssh --help to know more
 ```
