@@ -49,11 +49,56 @@ $ sudo modprobe br_netfilter
 ```
 
 Next we need to set some system level configurations
+```
+$ cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+> net.bridge.bridge-nf-call-iptables = 1
+> net.ipv4.ip_forward = 1
+> net.bridge.bridge-nf-call-ip6tables = 1
+> EOF
+```
+create a file in **/etc/sysvtl.d** called **kubernetes-cri.conf**  
+These are configurations needed for kubernetes networking.  
+We need to make sure these settings are set when server is set and we will apply it immediately
+```
+sudo sysctl --system
+```
 
+Next after this we can install containerd package
+```
+$ sudo apt-get update && sudo apt-get install -y containerd.io
+```
+Now my containerd package is installed, we can set containerd configuration file.
+```
+$ sudi mkdir -p /etc/containerd
+```
+This will contain my containerd configuration
+```
+sudo containerd config default | sudo tee /etc/containerd/config.toml 
+```
+containerd config default will generate configurations and that I'm storing in .toml file
+  
+Just to make sure my conatinerd is using my configuration file I will restart containerd and check status if it is up and running
+```
+$ sudo systemctl restart containerd
+$ sudo systemctl status containerd
+```
 
+Now we can install kubernetes packages, and it is necessary to disable swap
 
+```
+$ sudo swapoff -a
+```
 
+And install some packages which will be needed during installation process.
 
+```
+$ sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+```
 
+Download and add GPG key:
+```
+$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+```
+Then I can setup my repository configurations in **_/etc/apt/sources.list.d_**
 
 [Cluster]: ./img/LAB01_Building_a_Kubernetes_1.20_Cluster_with_Kubeadm.png "Kubernetes Cluster"
